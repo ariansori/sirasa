@@ -1,22 +1,48 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
-import DetailAssetPage from './pages/DetailAssetPage';
 import ScannerPage from './pages/ScannerPage';
+import DetailAssetPage from './pages/DetailAssetPage';
+import HistoryPage from './pages/HistoryPage';
 import './App.css';
+
+const PrivateRoute = ({ children }) => {
+  const token = localStorage.getItem('token');
+  return token ? children : <Navigate to="/login" replace />;
+};
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/scan" element={<ScannerPage />} />
+        {/* Route Public (Bisa diakses tanpa login) */}
+        <Route path="/login" element={<LoginPage />} />
+
+        {/* Route Private (Harus Login Dulu) */}
+        <Route path="/" element={
+          <PrivateRoute>
+            <HomePage />
+          </PrivateRoute>
+        } />
         
-        {/* PENTING: Gunakan :barcode sebagai parameter */}
-        <Route path="/asset/:barcode" element={<DetailAssetPage />} />
-        
-        {/* Placeholder halaman lain */}
-        <Route path="/history" element={<div className="app-container" style={{padding:20}}>Halaman Riwayat</div>} />
+        <Route path="/scan" element={
+          <PrivateRoute>
+            <ScannerPage />
+          </PrivateRoute>
+        } />
+
+        <Route path="/asset/:barcode" element={
+          <PrivateRoute>
+            <DetailAssetPage />
+          </PrivateRoute>
+        } />
+
+        <Route path="/history" element={
+          <PrivateRoute>
+            <HistoryPage />
+          </PrivateRoute>
+        } />
       </Routes>
     </Router>
   );
