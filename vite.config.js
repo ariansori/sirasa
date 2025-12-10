@@ -1,7 +1,34 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['sirasa.png'],
+      manifest: {
+        name: 'SIRASA App',
+        short_name: 'SIRASA',
+        description: 'Sistem Informasi Risiko dan Aset',
+        theme_color: '#3b82f6',
+        background_color: '#f8f9fa',
+        display: 'standalone',
+        icons: [
+          {
+            src: 'sirasa.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: 'sirasa.png',
+            sizes: '512x512',
+            type: 'image/png'
+          }
+        ]
+      },
+      devOptions: { enabled: true }
+    })
+  ],
 })
