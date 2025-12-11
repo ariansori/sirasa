@@ -7,92 +7,75 @@ const ScannerPage = () => {
   const navigate = useNavigate();
 
   const handleScan = (detectedCodes) => {
-    // Library ini mengembalikan array, kita ambil yang pertama
     if (detectedCodes && detectedCodes.length > 0) {
-      const code = detectedCodes[0].rawValue;
-      if (code) {
-        // Efek getar sedikit jika HP support (Feedback user)
+      const rawValue = detectedCodes[0].rawValue;
+      
+      if (rawValue) {
+        // --- LOGIKA PINTAR ---
+        // 1. Cek apakah ini URL (QR Code Public)
+        if (rawValue.includes('http') || rawValue.includes('vercel.app')) {
+            // Ambil bagian akhir URL saja (ID Asetnya)
+            // Contoh: https://.../public/asset/AST-123 -> Ambil AST-123
+            const parts = rawValue.split('/');
+            const assetId = parts[parts.length - 1]; // Ambil bagian paling belakang
+            navigate(`/asset/${assetId}`);
+        } 
+        // 2. Jika bukan URL, berarti ini Code 128 (ID Murni)
+        else {
+            // Langsung navigate karena isinya pasti "AST-xxxx"
+            navigate(`/asset/${rawValue}`);
+        }
+
+        // Feedback Getar
         if (navigator.vibrate) navigator.vibrate(200);
-        
-        // Pindah ke halaman detail aset
-        navigate(`/asset/${code}`);
       }
     }
-  };
-
-  const handleError = (err) => {
-    console.error("Error Kamera:", err);
-    // Jangan alert error terus menerus agar tidak mengganggu
   };
 
   return (
     <div style={{position:'fixed', top:0, left:0, width:'100%', height:'100%', background:'#000', zIndex:100}}>
       
-      {/* Header Tombol Close */}
       <div style={{position:'absolute', top:0, left:0, right:0, zIndex:20, padding:'24px', textAlign:'center', color:'white', background:'linear-gradient(to bottom, rgba(0,0,0,0.7), transparent)'}}>
         <button onClick={() => navigate(-1)} style={{position:'absolute', left:'24px', background:'none', border:'none', color:'white', cursor:'pointer'}}>
           <X size={28} />
         </button>
         <h2 style={{margin:0, fontSize:'18px', fontWeight:600}}>Scan Barcode</h2>
-        <p style={{fontSize:'12px', opacity:0.9, margin:'4px 0 0'}}>Arahkan kamera ke label aset</p>
+        <p style={{fontSize:'12px', opacity:0.9, margin:'4px 0 0'}}>Mendukung QR Code & Barcode Aset (128)</p>
       </div>
 
-      {/* KOMPONEN SCANNER UTAMA */}
       <Scanner 
         onScan={handleScan}
-        onError={handleError}
-        // 👇 INI BAGIAN PENTINGNYA: Aktifkan semua jenis barcode umum
+        onError={(err) => console.error(err)}
+        // AKTIFKAN SEMUA FORMAT AGAR CODE 128 TERBACA
         formats={[
           'qr_code', 
-          'code_128', // Paling umum untuk aset kantor
-          'code_39',  // Umum untuk inventaris lama
-          'code_93', 
-          'ean_13',   // Produk retail
-          'ean_8', 
-          'upc_a',
+          'code_128', 
+          'code_39', 
           'codabar'
         ]}
-        components={{ 
-          audio: false, // Matikan bunyi beep bawaan (kita pakai vibrate)
-          finder: false // Kita pakai overlay manual di bawah agar lebih bagus
-        }}
-        styles={{ 
-          container: { height: '100%', width: '100%' },
-          video: { objectFit: 'cover' }
-        }}
-        // Gunakan kamera belakang
+        components={{ audio: false, finder: false }}
+        styles={{ container: { height: '100%', width: '100%' }, video: { objectFit: 'cover' } }}
         constraints={{ facingMode: 'environment' }}
       />
 
-      {/* --- OVERLAY VISUAL (Kotak Fokus) --- */}
+      {/* Overlay Visual */}
       <div style={{
           position:'absolute', top:'50%', left:'50%', transform:'translate(-50%, -50%)',
-          width:'280px', height:'180px', // Sedikit persegi panjang agar pas untuk barcode panjang
+          width:'280px', height:'150px', // Agak pipih agar cocok untuk barcode panjang
           zIndex:10, pointerEvents:'none'
       }}>
-          {/* Garis Pojok Biru */}
+          {/* Garis Pojok */}
           <div style={{position:'absolute', top:0, left:0, width:'40px', height:'40px', borderTop:'6px solid #3b82f6', borderLeft:'6px solid #3b82f6', borderRadius:'16px 0 0 0'}}></div>
           <div style={{position:'absolute', top:0, right:0, width:'40px', height:'40px', borderTop:'6px solid #3b82f6', borderRight:'6px solid #3b82f6', borderRadius:'0 16px 0 0'}}></div>
           <div style={{position:'absolute', bottom:0, left:0, width:'40px', height:'40px', borderBottom:'6px solid #3b82f6', borderLeft:'6px solid #3b82f6', borderRadius:'0 0 0 16px'}}></div>
           <div style={{position:'absolute', bottom:0, right:0, width:'40px', height:'40px', borderBottom:'6px solid #3b82f6', borderRight:'6px solid #3b82f6', borderRadius:'0 0 16px 0'}}></div>
           
-          {/* Garis Merah Scanning (Animasi) */}
+          {/* Laser Merah */}
           <div style={{
-            position: 'absolute', top: '10%', left: '5%', right: '5%', height: '2px', 
+            position: 'absolute', top: '50%', left: '5%', right: '5%', height: '2px', 
             background: 'rgba(239, 68, 68, 0.8)', boxShadow: '0 0 8px rgba(239, 68, 68, 0.8)',
-            animation: 'scanMove 2s infinite linear'
           }}></div>
       </div>
-
-      {/* Tambahkan CSS Animasi Garis */}
-      <style>{`
-        @keyframes scanMove {
-          0% { top: 10%; opacity: 0; }
-          20% { opacity: 1; }
-          80% { opacity: 1; }
-          100% { top: 90%; opacity: 0; }
-        }
-      `}</style>
 
     </div>
   );
