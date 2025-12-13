@@ -3,7 +3,7 @@ import { ChevronLeft, AlertTriangle, Calendar, Activity, CheckCircle, Clock } fr
 import { useNavigate, useParams } from 'react-router-dom';
 
 // URL API
-const API_URL = "https://asset-risk-management.vercel.app"; 
+const API_URL = import.meta.env.VITE_LINK_API_SIRASA; 
 
 // Helper Warna Badge Status
 const getBadgeClass = (statusName) => {
@@ -35,32 +35,43 @@ const DetailAssetPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch Data (Hybrid: Public Aset + Private Detail)
+// Fetch Data (Full Private API)
   useEffect(() => {
     if (barcode) {
       setLoading(true);
+
+      // 1. AMBIL TOKEN & BUAT HEADER (Wajib di awal)
+      const token = localStorage.getItem('token');
       
-      // 1. Fetch Data Aset (PUBLIC)
-      fetch(`${API_URL}/api/assets/public/barcode/${barcode}`)
+      // Jika token tidak ada, stop (atau redirect)
+      if (!token) {
+        setError("Akses ditolak. Silakan login terlebih dahulu.");
+        setLoading(false);
+        return;
+      }
+
+      const authHeaders = { 
+        'Authorization': `Bearer ${token}`, 
+        'Content-Type': 'application/json' 
+      };
+
+      // 2. Fetch Data Aset (PRIVATE - Pakai Header)
+      fetch(`${API_URL}/api/assets/barcode/${barcode}`, { headers: authHeaders })
         .then(res => {
+          if (res.status === 401) throw new Error('Sesi habis. Silakan login kembali.');
           if (res.status === 404) throw new Error('Aset tidak ditemukan.');
           if (!res.ok) throw new Error('Gagal mengambil data.');
           return res.json();
         })
         .then(data => {
-          // Normalisasi data (jika dibungkus .data)
+          // Normalisasi data
           const assetData = data.data ? data.data : data;
           setAsset(assetData);
           setError(null);
 
-          // 2. Fetch Data Tambahan (PRIVATE - Butuh Token)
-          const token = localStorage.getItem('token');
-          if (token && assetData?.id) {
-             const authHeaders = { 
-               'Authorization': `Bearer ${token}`, 
-               'Content-Type': 'application/json' 
-             };
-
+          // 3. Fetch Data Tambahan (Pakai authHeaders yang sama)
+          if (assetData?.id) {
+             
              // A. Ambil Risiko
              fetch(`${API_URL}/api/risks`, { headers: authHeaders })
                .then(r => r.ok ? r.json() : [])
@@ -86,6 +97,11 @@ const DetailAssetPage = () => {
         .catch(err => {
           setError(err.message);
           setAsset(null);
+          // Opsional: Jika error 401, redirect ke login
+          if (err.message.includes('Sesi habis')) {
+             localStorage.removeItem('token');
+             navigate('/login');
+          }
         })
         .finally(() => setLoading(false));
     }

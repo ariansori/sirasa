@@ -12,15 +12,15 @@ const ScannerPage = () => {
       
       if (rawValue) {
         // --- LOGIKA PINTAR ---
-        // 1. Cek apakah ini URL (QR Code Public)
+        //Cek apakah ini URL (QR Code Public)
         if (rawValue.includes('http') || rawValue.includes('vercel.app')) {
             // Ambil bagian akhir URL saja (ID Asetnya)
             // Contoh: https://.../public/asset/AST-123 -> Ambil AST-123
             const parts = rawValue.split('/');
-            const assetId = parts[parts.length - 1]; // Ambil bagian paling belakang
+            const assetId = parts[parts.length - 1];
             navigate(`/asset/${assetId}`);
         } 
-        // 2. Jika bukan URL, berarti ini Code 128 (ID Murni)
+        //Jika bukan URL, berarti ini Code 128 (ID Murni)
         else {
             // Langsung navigate karena isinya pasti "AST-xxxx"
             navigate(`/asset/${rawValue}`);
