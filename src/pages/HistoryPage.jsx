@@ -3,7 +3,7 @@ import { ChevronLeft, Calendar, CheckCircle, Search, Filter, Wrench } from 'luci
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../component/BottomNav';
 
-const API_URL = "https://asset-risk-management.vercel.app";
+const API_URL = import.meta.env.VITE_LINK_API_SIRASA;
 
 // --- HELPER FORMAT ---
 const formatDate = (dateString) => {

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../App.css'; // Menggunakan style global yang sudah ada
 
+const API_SSO_URL = import.meta.env.VITE_LINK_API_SSO;
+
 const LoginPage = () => {
   const navigate = useNavigate();
   
@@ -17,7 +19,7 @@ const LoginPage = () => {
     setError(null);
 
     try {
-      const response = await fetch('https://sso-user-management.vercel.app/api/sso/auth/login', {
+      const response = await fetch(`${API_SSO_URL}/api/sso/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

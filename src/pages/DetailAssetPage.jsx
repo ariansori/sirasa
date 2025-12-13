@@ -204,20 +204,33 @@ const DetailAssetPage = () => {
           </div>
         </div>
 
-        {/* KARTU 3: Keterkaitan Risiko */}
+        {/* KARTU 3: Keterkaitan Risiko (YANG ANDA MINTA) */}
         <div className="card">
            <h3 style={{fontSize:'14px', margin:'0 0 16px', color:'#c2410c', fontWeight:'700', display:'flex', alignItems:'center', gap:'8px'}}>
              <AlertTriangle size={16}/> Keterkaitan Risiko
            </h3>
            
            {risks.length > 0 ? risks.map((r, i) => (
-             <div key={i} style={{background:'#fff7ed', padding:'12px', borderRadius:'10px', border:'1px solid #ffedd5', marginBottom:'10px'}}>
+             <div 
+                key={i} 
+                onClick={() => navigate(`/risk/${r.id}`)} // INI NAVIGASINYA
+                style={{
+                    background:'#fff7ed', padding:'12px', borderRadius:'10px', 
+                    border:'1px solid #ffedd5', marginBottom:'10px',
+                    cursor: 'pointer' // INI POINTERNYA
+                }}
+             >
                <div style={{display:'flex', justifyContent:'space-between', marginBottom:'6px'}}>
                  <span style={{fontSize:'10px', fontWeight:'bold', color:'#c2410c', background:'white', padding:'2px 6px', borderRadius:'4px', border:'1px solid #fed7aa'}}>{r.risk_code}</span>
                  <span style={{fontSize:'10px', color:'#9a3412'}}>{formatDate(r.created_at)}</span>
                </div>
                <p style={{fontSize:'12px', fontWeight:'600', color:'#431407', margin:'0 0 4px'}}>{r.description}</p>
-               <p style={{fontSize:'11px', color:'#7c2d12', margin:0}}>Dampak: {r.impact}</p>
+               
+               {/* Teks Lihat Detail */}
+               <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:'4px'}}>
+                   <p style={{fontSize:'11px', color:'#7c2d12', margin:0}}>Dampak: {r.impact}</p>
+                   <span style={{fontSize:'10px', color:'#f97316', fontWeight:'600'}}>Lihat Detail →</span>
+               </div>
              </div>
            )) : (
              <div style={{textAlign:'center', padding:'12px', background:'#f8f9fa', borderRadius:'10px', border:'1px dashed #e2e8f0'}}>

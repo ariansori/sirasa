@@ -5,6 +5,8 @@ import HomePage from './pages/HomePage';
 import ScannerPage from './pages/ScannerPage';
 import DetailAssetPage from './pages/DetailAssetPage';
 import HistoryPage from './pages/HistoryPage';
+import RiskDetailPage from './pages/RiskDetailPage';
+import TreatmentDetailPage from './pages/TreatmentDetailPage';
 import './App.css';
 
 const PrivateRoute = ({ children }) => {
@@ -41,6 +43,18 @@ function App() {
         <Route path="/history" element={
           <PrivateRoute>
             <HistoryPage />
+          </PrivateRoute>
+        } />
+
+        <Route path="/risk/:id" element={
+          <PrivateRoute>
+            <RiskDetailPage />
+          </PrivateRoute>
+        } />
+
+        <Route path="/treatment/:id" element={
+          <PrivateRoute>
+            <TreatmentDetailPage />
           </PrivateRoute>
         } />
       </Routes>
