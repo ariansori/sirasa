@@ -7,7 +7,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['sirasa.png'],
+      includeAssets: ['logo.png'],
       manifest: {
         name: 'SIRASA App',
         short_name: 'SIRASA',
@@ -17,12 +17,12 @@ export default defineConfig({
         display: 'standalone',
         icons: [
           {
-            src: 'sirasa.png',
+            src: 'logo.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: 'sirasa.png',
+            src: 'logo.png',
             sizes: '512x512',
             type: 'image/png'
           }

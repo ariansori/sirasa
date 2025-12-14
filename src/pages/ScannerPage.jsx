@@ -99,7 +99,7 @@ const ScannerPage = () => {
       {!showInput && (
         <div style={{
             position:'absolute', top:'50%', left:'50%', transform:'translate(-50%, -50%)',
-            width:'350px', height:'140px', 
+            width:'320px', height:'320px', 
             zIndex:10, pointerEvents:'none'
         }}>
             {/* Sudut-sudut Tebal */}
